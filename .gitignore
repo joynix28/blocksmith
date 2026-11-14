@@ -1,0 +1,18 @@
+# Gradle / Android
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Signature : jamais dans le dépôt
+keys/
+*.jks
+*.keystore
+
+# Système
+.DS_Store
+*.log

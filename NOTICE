@@ -1,0 +1,22 @@
+Blocksmith
+Copyright 2026 Joynix — https://github.com/joynix28
+
+Concept original, direction artistique, game design et implémentation : Joynix.
+
+Si vous réutilisez ce code, son design ou l'idée derrière le jeu, vous devez
+conserver cette notice et créditer l'auteur avec un lien vers le dépôt
+d'origine : https://github.com/joynix28/blocksmith
+
+--------------------------------------------------------------------------------
+
+Composants tiers :
+
+- Space Grotesk, Copyright 2020 The Space Grotesk Project Authors
+  (https://github.com/floriankarsten/space-grotesk)
+  Sous SIL Open Font License 1.1 — voir shared/src/commonMain/composeResources/font/OFL.txt
+
+- Kotlin, Jetpack Compose, Compose Multiplatform — Apache License 2.0
+  (https://www.jetbrains.com, https://developer.android.com)
+
+- Effets sonores : synthétisés pour ce projet (scripts/gen_sounds.py), aucune
+  banque de sons sous licence.
