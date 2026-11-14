@@ -2,6 +2,12 @@
 
 **Le puzzle de blocs 8×8, sans publicité, sans compte, hors-ligne.**
 
+<p>
+  <a href="https://github.com/joynix28/blocksmith/releases/latest/download/Blocksmith-1.0.0.apk">
+    <img src="https://img.shields.io/badge/T%C3%A9l%C3%A9charger%20l'APK-1.1%20Mo-ffc857?style=for-the-badge&logo=android&logoColor=14101f" alt="Télécharger l'APK">
+  </a>
+</p>
+
 Un jeu de placement de pièces inspiré des puzzles de blocs classiques : trois
 pièces à la fois, des lignes à compléter, des combos à entretenir. Pas de
 bannière, pas de monnaie virtuelle, pas de « revive » payant. Le jeu ne demande
@@ -89,6 +95,10 @@ pas la courbe de difficulté.
 ./gradlew :app:assembleRelease
 # app/build/outputs/apk/release/app-release.apk
 ```
+
+APK signé de la version 1.0.0 :
+[releases/tag/v1.0.0](https://github.com/joynix28/blocksmith/releases/tag/v1.0.0)
+(miroir : <https://gofile.io/d/psr7TmPh>).
 
 La signature utilise `keys/blocksmith.jks` (absent du dépôt). Sans ce fichier,
 la compilation retombe sur la signature de debug — pratique pour tester, à
