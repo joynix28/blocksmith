@@ -34,6 +34,7 @@ fun LevelsScreen(
     onBack: () -> Unit,
     onPlay: (Int) -> Unit,
 ) {
+    val strings = LocalStrings.current
     val highestDone = progress.stars.keys.filter { it > 0 }.maxOrNull() ?: 0
     val unlocked = (highestDone + 1).coerceAtMost(Levels.all.size)
 
@@ -49,8 +50,8 @@ fun LevelsScreen(
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    AppText("NIVEAUX", style = Typo.label, color = Ink.Accent)
-                    AppText("Choisis ton défi", style = Typo.heading, color = Ink.Text)
+                    AppText(strings.levels, style = Typo.label, color = Ink.Accent)
+                    AppText(strings.chooseLevel, style = Typo.heading, color = Ink.Text)
                 }
                 Row(
                     Modifier
@@ -177,7 +178,7 @@ private fun LevelCard(
             if (unlocked) {
                 StarRow(stars = stars, size = 13.dp, gap = 2.dp)
             } else {
-                AppText("verrouillé", style = Typo.label.copy(fontSize = 9.sp, letterSpacing = 0.6.sp), color = Ink.Faint)
+                AppText(LocalStrings.current.locked, style = Typo.label.copy(fontSize = 9.sp, letterSpacing = 0.6.sp), color = Ink.Faint)
             }
         }
         if (current) {

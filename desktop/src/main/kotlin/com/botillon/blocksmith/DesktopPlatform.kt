@@ -36,6 +36,10 @@ class DesktopProgressStore : ProgressStore {
                 haptics = props.getProperty("haptics")?.toBooleanStrictOrNull() ?: true,
                 dailyDay = props.getProperty("dailyDay")?.toIntOrNull() ?: 0,
                 dailyBest = props.getProperty("dailyBest")?.toLongOrNull() ?: 0L,
+                lang = runCatching {
+                    com.botillon.blocksmith.ui.Lang.valueOf(props.getProperty("lang", "FR"))
+                }.getOrDefault(com.botillon.blocksmith.ui.Lang.FR),
+                zoom = props.getProperty("zoom")?.toFloatOrNull() ?: 1f,
             )
         }.getOrDefault(Progress())
     }
@@ -53,6 +57,8 @@ class DesktopProgressStore : ProgressStore {
             props.setProperty("haptics", progress.haptics.toString())
             props.setProperty("dailyDay", progress.dailyDay.toString())
             props.setProperty("dailyBest", progress.dailyBest.toString())
+            props.setProperty("lang", progress.lang.name)
+            props.setProperty("zoom", progress.zoom.toString())
             file.outputStream().use { props.store(it, "Blocksmith") }
         }
     }

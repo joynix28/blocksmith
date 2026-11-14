@@ -10,6 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import blocksmith.shared.generated.resources.Res
 import blocksmith.shared.generated.resources.space_grotesk_bold
 import blocksmith.shared.generated.resources.space_grotesk_medium
@@ -36,6 +38,7 @@ fun App(
     Typo.family = family
 
     var progress by remember { mutableStateOf(store.load()) }
+    val baseDensity = LocalDensity.current
     var screen by remember { mutableStateOf<Screen>(Screen.Home) }
     var seed by remember { mutableStateOf(Random.nextLong()) }
 
@@ -90,6 +93,8 @@ fun App(
     CompositionLocalProvider(
         LocalSound provides effectiveSound,
         LocalHaptics provides effectiveHaptics,
+        LocalStrings provides Strings(progress.lang),
+        LocalDensity provides Density(baseDensity.density * progress.zoom, baseDensity.fontScale),
     ) {
         HandleBack(enabled = screen != Screen.Home) {
             screen = Screen.Home
@@ -118,6 +123,8 @@ fun App(
                     onBack = { screen = Screen.Home },
                     onToggleSound = { enabled -> update { it.copy(sound = enabled) } },
                     onToggleHaptics = { enabled -> update { it.copy(haptics = enabled) } },
+                    onLang = { lang -> update { it.copy(lang = lang) } },
+                    onZoom = { zoom -> update { it.copy(zoom = zoom) } },
                     onReset = {
                         update { p ->
                             Progress(
@@ -125,6 +132,8 @@ fun App(
                                 stars = emptyMap(),
                                 sound = p.sound,
                                 haptics = p.haptics,
+                                lang = p.lang,
+                                zoom = p.zoom,
                             )
                         }
                     },

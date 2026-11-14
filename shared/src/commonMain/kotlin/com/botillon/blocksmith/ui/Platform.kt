@@ -35,6 +35,8 @@ data class Progress(
     val haptics: Boolean = true,
     val dailyDay: Int = 0,
     val dailyBest: Long = 0,
+    val lang: Lang = Lang.FR,
+    val zoom: Float = 1f,
 ) {
     val totalStars: Int get() = stars.values.sum()
     val clearedLevels: Int get() = stars.size

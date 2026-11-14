@@ -72,6 +72,7 @@ fun GameScreen(
 ) {
     val sound = LocalSound.current
     val haptics = LocalHaptics.current
+    val strings = LocalStrings.current
 
     val session = remember(level?.id, seed) { GameSession(level, seed) }
     var state by remember { mutableStateOf(session.initial) }
@@ -153,7 +154,7 @@ fun GameScreen(
                         sound.play(Sound.CLEAR)
                     }
                     haptics.thud()
-                    banner = bannerFor(event.fx)
+                    banner = bannerFor(event.fx, strings)
                 }
 
                 is GameEvent.ComboUp -> if (event.combo >= 5) sound.play(Sound.COMBO)
@@ -223,7 +224,7 @@ fun GameScreen(
                     BestPill(best)
                     Spacer(Modifier.weight(1f))
                     if (level != null) {
-                        Chip("${state.moves}/${level.par} poses")
+                        Chip("${state.moves}/${level.par} ${strings.moves}")
                         Spacer(Modifier.width(8.dp))
                     }
                     CircleButton(onClick = { showHint() }) {
@@ -241,7 +242,7 @@ fun GameScreen(
 
                 if (level != null) {
                     Spacer(Modifier.height(8.dp))
-                    GoalCard(level = level, state = state)
+                    GoalCard(level = level, state = state, strings = strings)
                 }
 
                 Box(
@@ -312,7 +313,7 @@ fun GameScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     AppText(
-                        text = footerText(state, level),
+                        text = footerText(state, level, strings),
                         style = Typo.body.copy(fontSize = 12.sp),
                         color = Ink.Muted,
                     )
@@ -330,6 +331,7 @@ fun GameScreen(
         val currentOverlay = overlay
         if (currentOverlay != null) {
             ResultOverlay(
+                strings = strings,
                 won = currentOverlay is Overlay.Won,
                 stars = (currentOverlay as? Overlay.Won)?.stars ?: 0,
                 score = state.score,
@@ -390,7 +392,7 @@ private fun ComboBadge(combo: Int) {
 }
 
 @Composable
-private fun GoalCard(level: Level, state: GameState) {
+private fun GoalCard(level: Level, state: GameState, strings: Strings) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -400,7 +402,7 @@ private fun GoalCard(level: Level, state: GameState) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             AppText(
-                text = level.goal.label,
+                text = strings.goal(level.goal),
                 style = Typo.body.copy(fontSize = 13.sp),
                 color = Ink.TextSoft,
                 modifier = Modifier.weight(1f),
@@ -418,6 +420,7 @@ private fun GoalCard(level: Level, state: GameState) {
 
 @Composable
 fun ResultOverlay(
+    strings: Strings = Strings(Lang.FR),
     won: Boolean,
     stars: Int,
     score: Long,
@@ -451,7 +454,7 @@ fun ResultOverlay(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 AppText(
-                    text = if (won) "NIVEAU RÉUSSI" else if (level != null) "OBJECTIF MANQUÉ" else "PARTIE TERMINÉE",
+                    text = if (won) strings.win else if (level != null) strings.lose else strings.gameOver,
                     style = Typo.label.copy(letterSpacing = 2.sp),
                     color = if (won) Ink.Mint else Ink.Muted,
                 )
@@ -467,12 +470,12 @@ fun ResultOverlay(
                 }
                 if (score >= best && best > 0) {
                     Spacer(Modifier.height(8.dp))
-                    Chip("NOUVEAU RECORD", color = Color(0xFF22180A), background = Ink.Accent)
+                    Chip(strings.newRecord, color = Color(0xFF22180A), background = Ink.Accent)
                 }
                 if (!won && level != null) {
                     Spacer(Modifier.height(8.dp))
                     AppText(
-                        text = level.goal.label,
+                        text = strings.goal(level.goal),
                         style = Typo.body,
                         color = Ink.Muted,
                         align = TextAlign.Center,
@@ -482,13 +485,13 @@ fun ResultOverlay(
                 Spacer(Modifier.height(22.dp))
 
                 PrimaryButton(
-                    label = if (won && onNext != null) "CONTINUER" else "REJOUER",
+                    label = if (won && onNext != null) strings.continueLabel else strings.replay,
                     onClick = { if (won && onNext != null) onNext() else onReplay() },
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(10.dp))
                 SecondaryButton(
-                    label = "MENU",
+                    label = strings.menu,
                     onClick = onExit,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -497,23 +500,23 @@ fun ResultOverlay(
     }
 }
 
-private fun bannerFor(fx: ClearFx): Banner? {
+private fun bannerFor(fx: ClearFx, strings: Strings): Banner? {
     val text = when {
-        fx.perfect -> "PARFAIT !"
-        fx.lines >= 4 -> "QUADRUPLÉ !"
-        fx.lines == 3 -> "TRIPLE !"
-        fx.combo >= 10 -> "LÉGENDAIRE"
-        fx.combo >= 8 -> "INCROYABLE"
-        fx.combo >= 6 -> "EN FEU"
-        fx.combo >= 4 -> "SUPERBE"
-        fx.lines == 2 -> "DOUBLE !"
+        fx.perfect -> strings.perfect
+        fx.lines >= 4 -> strings.quad
+        fx.lines == 3 -> strings.triple
+        fx.combo >= 10 -> strings.legendary
+        fx.combo >= 8 -> strings.amazing
+        fx.combo >= 6 -> strings.onFire
+        fx.combo >= 4 -> strings.superb
+        fx.lines == 2 -> strings.double
         else -> return null
     }
     val color = if (fx.perfect) Ink.Mint else Ink.Accent
     return Banner(text, color, fx.combo.toLong())
 }
 
-private fun footerText(state: GameState, level: Level?): String {
-    if (level != null) return "Objectif : ${level.goal.label.lowercase()}"
-    return if (state.combo >= 2) "Combo ×${state.combo}" else "Continue comme ça"
+private fun footerText(state: GameState, level: Level?, strings: Strings): String {
+    if (level != null) return strings.goal(level.goal)
+    return if (state.combo >= 2) "${strings.combo} ×${state.combo}" else strings.keepGoing
 }

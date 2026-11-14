@@ -31,6 +31,10 @@ class AndroidProgressStore(context: Context) : ProgressStore {
             haptics = prefs.getBoolean(KEY_HAPTICS, true),
             dailyDay = prefs.getInt(KEY_DAILY_DAY, 0),
             dailyBest = prefs.getLong(KEY_DAILY_BEST, 0L),
+            lang = runCatching {
+                com.botillon.blocksmith.ui.Lang.valueOf(prefs.getString("lang", "FR") ?: "FR")
+            }.getOrDefault(com.botillon.blocksmith.ui.Lang.FR),
+            zoom = prefs.getFloat("zoom", 1f),
         )
     }
 
@@ -43,6 +47,8 @@ class AndroidProgressStore(context: Context) : ProgressStore {
             .putBoolean(KEY_HAPTICS, progress.haptics)
             .putInt(KEY_DAILY_DAY, progress.dailyDay)
             .putLong(KEY_DAILY_BEST, progress.dailyBest)
+            .putString("lang", progress.lang.name)
+            .putFloat("zoom", progress.zoom)
             .apply()
     }
 

@@ -39,6 +39,7 @@ fun HomeScreen(
     onDaily: () -> Unit,
     onSettings: () -> Unit,
 ) {
+    val s = LocalStrings.current
     Backdrop {
         Column(
             Modifier
@@ -55,14 +56,14 @@ fun HomeScreen(
 
             Spacer(Modifier.height(26.dp))
 
-            AppText("PUZZLE DE BLOCS", style = Typo.label, color = Ink.Accent)
+            AppText(s.eyebrow, style = Typo.label, color = Ink.Accent)
             Spacer(Modifier.height(6.dp))
             Row {
                 AppText("Block", style = Typo.display, color = Ink.Text)
                 AppText("smith", style = Typo.display, color = Ink.Accent)
             }
             Spacer(Modifier.height(6.dp))
-            AppText("Aligne. Efface. Recommence.", style = Typo.body, color = Ink.Muted)
+            AppText(s.tagline, style = Typo.body, color = Ink.Muted)
 
             Spacer(Modifier.height(18.dp))
 
@@ -77,13 +78,13 @@ fun HomeScreen(
                 StatChip(
                     icon = { drawStar(center, size.minDimension * 0.46f, Ink.Accent) },
                     value = "$totalStars",
-                    label = "étoiles",
+                    label = s.stars,
                     modifier = Modifier.weight(1f),
                 )
                 StatChip(
                     icon = { drawCheck(center, size.minDimension, Ink.Mint) },
                     value = "$clearedLevels",
-                    label = "niveaux",
+                    label = s.cleared,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -91,7 +92,7 @@ fun HomeScreen(
             Spacer(Modifier.height(14.dp))
 
             PrimaryButton(
-                label = "JOUER",
+                label = s.play,
                 onClick = onPlay,
                 modifier = Modifier.fillMaxWidth(),
                 icon = { drawPlay(center, size.minDimension * 1.15f, Color(0xFF22180A)) },
@@ -101,13 +102,13 @@ fun HomeScreen(
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 SecondaryButton(
-                    label = "NIVEAUX",
+                    label = s.levels,
                     onClick = onLevels,
                     modifier = Modifier.weight(1f),
                     icon = { drawLevelsIcon(center, size.minDimension, Ink.Accent) },
                 )
                 SecondaryButton(
-                    label = "DÉFI",
+                    label = s.daily,
                     onClick = onDaily,
                     modifier = Modifier.weight(1f),
                     icon = { drawGift(center, size.minDimension, Ink.Combo) },
@@ -116,7 +117,7 @@ fun HomeScreen(
 
             Spacer(Modifier.height(16.dp))
             AppText(
-                text = "Sans publicité · Sans compte · Hors-ligne",
+                text = s.offline,
                 style = Typo.label.copy(letterSpacing = 0.6.sp),
                 color = Ink.Faint,
                 align = TextAlign.Center,
