@@ -45,6 +45,7 @@ import com.botillon.blocksmith.game.GameEvent
 import com.botillon.blocksmith.game.GameSession
 import com.botillon.blocksmith.game.GameState
 import com.botillon.blocksmith.game.Level
+import com.botillon.blocksmith.game.Piece
 import com.botillon.blocksmith.game.Rules
 import com.botillon.blocksmith.game.SIZE
 import com.botillon.blocksmith.game.Status
@@ -179,14 +180,24 @@ fun GameScreen(
         }
     }
 
+    fun previewAt(pointer: Offset, grab: Offset, piece: Piece): Preview? {
+        if (boardCell <= 0f) return null
+        val (cx, cy) = targetCell(pointer, grab, boardOrigin, boardCell)
+        return Preview(cx, cy, Rules.fits(state.board, piece, cx, cy))
+    }
+
+    /**
+     * Au relâchement on recalcule la cible à partir de la dernière position du
+     * doigt (et non du dernier événement de déplacement), puis on aimante d'une
+     * case si besoin. C'est ce qui rend le dépôt fiable.
+     */
     fun endDrag() {
-        val current = drag
-        val target = preview
+        val current = drag ?: return
         drag = null
         preview = null
-        if (current != null && target != null && target.valid) {
-            applyMove(current.slot, target.x, target.y)
-        }
+        val (cx, cy) = targetCell(current.pointer, current.grab, boardOrigin, boardCell)
+        val target = snapPlacement(state.board, current.piece, cx, cy) ?: return
+        applyMove(current.slot, target.x, target.y)
     }
 
     fun showHint() {
@@ -275,7 +286,7 @@ fun GameScreen(
                     onDragStart = { slot, piece, pointer, grab ->
                         if (state.status == Status.PLAYING) {
                             drag = DragState(slot, piece, pointer, grab)
-                            preview = null
+                            preview = previewAt(pointer, grab, piece)
                             haptics.tap()
                         }
                     },
@@ -284,13 +295,14 @@ fun GameScreen(
                         if (current != null) {
                             val moved = current.copy(pointer = current.pointer + amount)
                             drag = moved
-                            if (boardCell > 0f) {
-                                val (cx, cy) = targetCell(moved.pointer, moved.grab, boardOrigin, boardCell)
-                                preview = Preview(cx, cy, Rules.fits(state.board, moved.piece, cx, cy))
-                            }
+                            preview = previewAt(moved.pointer, moved.grab, moved.piece)
                         }
                     },
                     onDragEnd = { endDrag() },
+                    onDragCancel = {
+                        drag = null
+                        preview = null
+                    },
                 )
 
                 Spacer(Modifier.height(8.dp))

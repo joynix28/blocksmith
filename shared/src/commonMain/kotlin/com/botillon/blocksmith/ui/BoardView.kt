@@ -255,6 +255,7 @@ fun Tray(
     onDragStart: (slot: Int, piece: Piece, pointerRoot: Offset, grab: Offset) -> Unit,
     onDrag: (Offset) -> Unit,
     onDragEnd: () -> Unit,
+    onDragCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     androidx.compose.foundation.layout.Row(
@@ -271,6 +272,7 @@ fun Tray(
                 onDragStart = { pointer, grab -> piece?.let { onDragStart(slot, it, pointer, grab) } },
                 onDrag = onDrag,
                 onDragEnd = onDragEnd,
+                onDragCancel = onDragCancel,
             )
         }
     }
@@ -285,6 +287,7 @@ private fun TraySlot(
     onDragStart: (pointerRoot: Offset, grab: Offset) -> Unit,
     onDrag: (Offset) -> Unit,
     onDragEnd: () -> Unit,
+    onDragCancel: () -> Unit,
 ) {
     var origin by remember { mutableStateOf(Offset.Zero) }
     var slotSize by remember { mutableStateOf(IntSize.Zero) }
@@ -344,7 +347,7 @@ private fun TraySlot(
                             onDrag(amount)
                         },
                         onDragEnd = { onDragEnd() },
-                        onDragCancel = { onDragEnd() },
+                        onDragCancel = { onDragCancel() },
                     )
                 },
         )
@@ -362,6 +365,29 @@ fun targetCell(pointer: Offset, grab: Offset, boardOrigin: Offset, cell: Float):
     val x = ((pointer.x - grab.x - boardOrigin.x) / cell).roundToInt()
     val y = ((pointer.y - grab.y - boardOrigin.y) / cell).roundToInt()
     return x to y
+}
+
+/**
+ * Aimantation douce : si la case visée est occupée ou déborde d'une case, on
+ * accepte la pose valide la plus proche. C'est ce qui évite le sentiment que
+ * « le bloc ne se pose pas » quand le doigt est à quelques pixels de la cible.
+ */
+fun snapPlacement(board: Board, piece: Piece, idealX: Int, idealY: Int): Coord? {
+    if (Rules.fits(board, piece, idealX, idealY)) return Coord(idealX, idealY)
+    var best: Coord? = null
+    var bestDistance = Int.MAX_VALUE
+    for (dy in -1..1) for (dx in -1..1) {
+        if (dx == 0 && dy == 0) continue
+        val x = idealX + dx
+        val y = idealY + dy
+        if (!Rules.fits(board, piece, x, y)) continue
+        val distance = dx * dx + dy * dy
+        if (distance < bestDistance) {
+            bestDistance = distance
+            best = Coord(x, y)
+        }
+    }
+    return best
 }
 
 fun Preview?.isSameAs(other: Preview?): Boolean =
